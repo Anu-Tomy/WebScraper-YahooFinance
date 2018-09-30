@@ -1,6 +1,10 @@
 package com.webscraper;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
@@ -25,8 +29,36 @@ public class StockControllerServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		
+		//Set up the printwriter
+		PrintWriter out = response.getWriter();
+		response.setContentType("text/plain");
+		
+		//Get a connection to the database
+		Connection myConn = null;
+		Statement myStmt = null;
+		ResultSet myRs = null;
+		
+		try {
+			myConn = dataSource.getConnection();
+			
+			//Create  SQL statements
+			String sql = "select * from stockstable";
+			myStmt = myConn.createStatement();
+			
+			//Execute SQL query
+			myRs = myStmt.executeQuery(sql);
+			
+			//Process the result set
+			while(myRs.next()) {
+				String symbol = myRs.getString("symbol");
+				out.println(symbol);				
+			}
+		}catch (Exception exc) {
+			exc.printStackTrace();
+		}
+		
+		
 	}
 
 }
